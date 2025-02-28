@@ -80,6 +80,7 @@ int main() {
                 int max = najwiekszy2D(tab, w, k);
                 printf("%i\n", max);
                 sumaCyfr(max);
+                usunTablice2D(tab,w);
                 break;
             }
             case 4: {
@@ -89,6 +90,7 @@ int main() {
                 przydzielPamiec2D(tab, w, w);
                 wypelnijTablice2D(tab, w, w, 7, 122);
                 srednia(tab, w, w);
+                usunTablice2D(tab, w);
                 break;
             }
             case 5: {
