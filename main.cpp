@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <limits>
 #include <time.h>
 #include <math.h>
 
@@ -39,9 +40,14 @@ int main() {
         for (int i = 1; i <= 4; i++) {
             std::cout << i << ") zadanie 1." << i + 1 << std::endl;
         }
-        std::cout << "5) wyjście z programu " << std::endl;
-
+        std::cout << "5) wyjscie z programu " << std::endl;
         std::cin >> wybor;
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Niepoprawne dane. Wpisz numer opcji.\n";
+            continue;
+        }
         switch (wybor) {
             case 1: {
                 int *tab, n;
@@ -80,7 +86,7 @@ int main() {
                 int max = najwiekszy2D(tab, w, k);
                 printf("%i\n", max);
                 sumaCyfr(max);
-                usunTablice2D(tab,w);
+                usunTablice2D(tab, w);
                 break;
             }
             case 4: {
