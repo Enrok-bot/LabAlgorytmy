@@ -1,233 +1,112 @@
 #include <iostream>
-#include <cstdlib>
-#include <limits>
-#include <time.h>
-#include <math.h>
+#include <regex>
 
-void przydzielPamiec1D(int *&tab, int n);
+void sortowanieBabelkowe(int *tab, int n, bool tryb);
 
-void przydzielPamiec2D(int **&tab, int w, int k);
+void sortowaniePrzezWybor(int *tab, int n, bool tryb);
 
-void wypelnijTablice1D(int *tab, int n, int a, int b);
+void sortowaniePrzezWstawianie(int *tab, int n, bool tryb);
 
-void wypelnijTablice2D(int **tab, int w, int k, int a, int b);
-
-void usunTablice1D(int *&tab);
-
-void usunTablice2D(int **&tab, int w);
-
-void wyswietl1D(int *tab, int n);
-
-void wyswietl2D(int **tab, int w, int k);
-
-int najmniejszy1D(int *tab, int n);
-
-int najwiekszy2D(int **tab, int w, int k);
-
-void czyPierwszy(int a);
-
-void zliczanie1D(int *tab, int n);
-
-void sumaCyfr(int a);
-
-void srednia(int **tab, int w, int k);
+void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol);
 
 int main() {
-    bool program = true;
-    int wybor;
+    int tab[5] = {9, 11, 3, 17, 5};
+    // sortowanieBabelkowe(tab, 5, 0);
+    // sortowaniePrzezWybor(tab, 5, 1);
+    // for (int i = 0; i < 5; i++) {
+    //     std::cout << tab[i] << " ";
+    // }
+    int **tab2;
+    tab2 = new int *[5];
+    for (int i = 0; i < 5; i++) {
+        tab2[i] = new int[5];
+    }
 
-    while (program) {
-        for (int i = 1; i <= 4; i++) {
-            std::cout << i << ") zadanie 1." << i + 1 << std::endl;
-        }
-        std::cout << "5) wyjscie z programu " << std::endl;
-        std::cin >> wybor;
-        if (std::cin.fail()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Niepoprawne dane. Wpisz numer opcji.\n";
-            continue;
-        }
-        switch (wybor) {
-            case 1: {
-                int *tab, n;
-                std::cout << "Podaj wielkosc tablicy: ";
-                std::cin >> n;
-                przydzielPamiec1D(tab, n);
-                int a, b;
-                std::cout << "Podaj przedzial <a,b>";
-                std::cin >> a >> b;
-                wypelnijTablice1D(tab, n, a, b);
-                int min = najmniejszy1D(tab, n);
-                printf("%i\n", min);
-                czyPierwszy(min);
-                usunTablice1D(tab);
-                break;
-            }
-            case 2: {
-                int *tab, n;
-                std::cout << "Podaj wielkosc tablicy: ";
-                std::cin >> n;
-                przydzielPamiec1D(tab, n);
-                wypelnijTablice1D(tab, n, 0, 9);
-                zliczanie1D(tab, n);
-                usunTablice1D(tab);
-                break;
-            }
-            case 3: {
-                int **tab, w, k;
-                std::cout << "Podaj wymiary tablicy";
-                std::cin >> w >> k;
-                przydzielPamiec2D(tab, w, k);
-                int a, b;
-                std::cout << "Podaj przedzial <a,b>";
-                std::cin >> a >> b;
-                wypelnijTablice2D(tab, w, k, a, b);
-                int max = najwiekszy2D(tab, w, k);
-                printf("%i\n", max);
-                sumaCyfr(max);
-                usunTablice2D(tab, w);
-                break;
-            }
-            case 4: {
-                int **tab, w;
-                std::cout << "Podaj wielkosc tablicy kwadratowej";
-                std::cin >> w;
-                przydzielPamiec2D(tab, w, w);
-                wypelnijTablice2D(tab, w, w, 7, 122);
-                srednia(tab, w, w);
-                usunTablice2D(tab, w);
-                break;
-            }
-            case 5: {
-                program = false;
-                break;
-            }
-            default: {
-                std::cout << "Nie ma takiej opcji";
-                break;
-            }
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            tab2[i][j] = (i + 1) * (j + 1);
         }
     }
-}
 
-void przydzielPamiec1D(int *&tab, int n) {
-    tab = new int[n];
-}
+    // sortowanieBabelkowe2D(tab2, 5, 5, 1, 3);
 
-void przydzielPamiec2D(int **&tab, int w, int k) {
-    tab = new int *[w];
-    for (int i = 0; i < w; i++) {
-        tab[i] = new int[k];
-    }
-}
-
-void wypelnijTablice1D(int *tab, int n, int a, int b) {
-    srand(time(NULL));
-    for (int i = 0; i < n; i++) {
-        tab[i] = rand() % (b - a + 1) + a;
-    }
-}
-
-void wypelnijTablice2D(int **tab, int w, int k, int a, int b) {
-    srand(time(NULL));
-    for (int i = 0; i < w; i++) {
-        for (int j = 0; j < k; j++) {
-            tab[i][j] = rand() % (b - a + 1) + a;
+    int i = 0;
+    while (i < 5) {
+        for (int j = 0; j < 5 - 1; j++) {
+                if (tab[3][j] > tab[3][j + 1]) {
+                    for (int c = 0; c < 5; c++) { std::swap(tab[c][3], tab[c][3]); }
+                }
+            }
         }
+        i++;
     }
-}
 
-void usunTablice1D(int *&tab) {
-    delete[] tab;
-}
-
-void usunTablice2D(int **&tab, int w) {
-    for (int i = 0; i < w; ++i) {
-        delete[] tab[i];
-    }
-    delete[] tab;
-}
-
-void wyswietl1D(int *tab, int n) {
-    for (int i = 0; i < n; ++i) {
-        std::cout << tab[i] << " ";
-    }
-}
-
-void wyswietl2D(int **tab, int w, int k) {
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < k; ++j) {
-            std::cout << tab[i][j] << " ";
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            std::cout << tab2[i][j] << " ";
         }
         std::cout << std::endl;
     }
+    return 0;
 }
 
-int najmniejszy1D(int *tab, int n) {
-    int min = tab[0];
-    for (int i = 1; i < n; ++i) {
-        if (tab[i] < min) {
-            min = tab[i];
+void sortowanieBabelkowe(int *tab, int n, bool tryb) {
+    int i = 0;
+    while (i < n) {
+        for (int j = 0; j < n - 1; j++) {
+            if (tryb) {
+                if (tab[j] > tab[j + 1]) {
+                    std::swap(tab[j], tab[j + 1]);
+                }
+            } else {
+                if (tab[j] < tab[j + 1]) {
+                    std::swap(tab[j], tab[j + 1]);
+                }
+            }
         }
+        i++;
     }
-    return min;
 }
 
-int najwiekszy2D(int **tab, int w, int k) {
-    int max = tab[0][0];
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < k; ++j) {
-            if (tab[i][j] > max) max = tab[i][j];
+void sortowaniePrzezWybor(int *tab, int n, int tryb) {
+    int tab2[5];
+    for (int i = 0; i < n; i++) {
+        int min = tab[i];
+        for (int j = i + 1; j < n; j++) {
+            if (tryb) {
+                if (tab[j] < min) {
+                    std::swap(min, tab[j]);
+                }
+            } else {
+                if (tab[j] > min) {
+                    std::swap(min, tab[j]);
+                }
+            }
         }
+        tab2[i] = min;
     }
-    return max;
-}
-
-void czyPierwszy(int a) {
-    bool piewsza = true;
-    for (int i = 2; i <= sqrt(a); ++i) {
-        if (a % i == 0) piewsza = false;
-    }
-    if (piewsza) std::cout << "Liczba jest pierwsza" << std::endl;
-    else std::cout << "Liczba nie jest pierwsza" << std::endl;
-}
-
-void zliczanie1D(int *tab, int n) {
-    int liczby[10];
-    for (int i = 0; i < 10; i++) {
-        liczby[i] = 0;
-    }
-    for (int i = 0; i < n; ++i) {
-        liczby[tab[i]]++;
-    }
-    for (int i = 0; i < 10; ++i) {
-        std::cout << "Cyfra " << i << "- " << liczby[i] << " razy" << std::endl;
+    for (int i = 0; i < 5; i++) {
+        tab[i] = tab2[i];
     }
 }
 
-void sumaCyfr(int a) {
-    int suma = 0;
-    do {
-        suma += a % 10;
-        a /= 10;
-    } while (a != 0);
-    printf("%i\n", suma);
+void sortowaniePrzezWstawianie(int *tab, int n, int tryb) {
 }
 
-void srednia(int **tab, int w, int k) {
-    int sredniaNad = 0;
-    for (int i = 0; i < w; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            sredniaNad += tab[i][j];
+void sortowanieBabelkowe2D(int **tab, int w, int k, int tryb, int nrKol) {
+    int i = 0;
+    while (i < k) {
+        for (int j = 0; j < k - 1; j++) {
+            if (tryb) {
+                if (tab[nrKol][j] > tab[nrKol][j + 1]) {
+                    for (int c = 0; c < w; c++) { std::swap(tab[c][nrKol], tab[c][nrKol]); }
+                }
+            } else {
+                if (tab[j] < tab[j + 1]) {
+                    for (int c = 0; c < w; c++) { std::swap(tab[c][nrKol], tab[c][nrKol]); }
+                }
+            }
         }
+        i++;
     }
-    printf("%i\n", sredniaNad);
-    int sredniaPod = 0;
-    for (int i = 1; i < w; ++i) {
-        for (int j = 0; j < i; ++j) {
-            sredniaPod += tab[i][j];
-        }
-    }
-    printf("%i\n", sredniaPod);
 }
