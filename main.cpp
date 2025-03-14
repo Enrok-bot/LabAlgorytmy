@@ -1,5 +1,6 @@
 #include <iostream>
 #include <regex>
+#include "tablice.h"
 
 void sortowanieBabelkowe(int *tab, int n, bool tryb);
 
@@ -10,44 +11,28 @@ void sortowaniePrzezWstawianie(int *tab, int n, bool tryb);
 void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol);
 
 int main() {
-    int tab[5] = {9, 11, 3, 17, 5};
-    // sortowanieBabelkowe(tab, 5, 0);
-    // sortowaniePrzezWybor(tab, 5, 1);
-    // for (int i = 0; i < 5; i++) {
-    //     std::cout << tab[i] << " ";
-    // }
-    int **tab2;
-    tab2 = new int *[5];
-    for (int i = 0; i < 5; i++) {
-        tab2[i] = new int[5];
-    }
+    int *tab1D, **tab2D;
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            tab2[i][j] = (i + 1) * (j + 1);
-        }
-    }
+    przydzielPamiec1D(tab1D, 10);
+    wypelnijTablice1D(tab1D, 10, -8, 24);
 
-    // sortowanieBabelkowe2D(tab2, 5, 5, 1, 3);
+    wyswietl1D(tab1D, 10);
 
-    int i = 0;
-    while (i < 5) {
-        for (int j = 0; j < 5 - 1; j++) {
-                if (tab[3][j] > tab[3][j + 1]) {
-                    for (int c = 0; c < 5; c++) { std::swap(tab[c][3], tab[c][3]); }
-                }
-            }
-        }
-        i++;
-    }
+    sortowanieBabelkowe(tab1D, 5, false);
+    // sortowaniePrzezWybor(tab1D, 5, 0);
+    // sortowaniePrzezWstawianie(tab1D, 5, true);
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            std::cout << tab2[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-    return 0;
+    wyswietl1D(tab1D, 10);
+    usunTablice1D(tab1D);
+
+    przydzielPamiec2D(tab2D, 10, 10);
+    wypelnijTablice2D(tab2D, 10, 10, -7, 38);
+
+    wyswietl2D(tab2D, 10, 10);
+    sortowanieBabelkowe2D(tab2D, 10, 10, true, 3);
+    wyswietl2D(tab2D, 10, 10);
+
+    usunTablice2D(tab2D,10);
 }
 
 void sortowanieBabelkowe(int *tab, int n, bool tryb) {
@@ -68,45 +53,43 @@ void sortowanieBabelkowe(int *tab, int n, bool tryb) {
     }
 }
 
-void sortowaniePrzezWybor(int *tab, int n, int tryb) {
-    int tab2[5];
-    for (int i = 0; i < n; i++) {
-        int min = tab[i];
-        for (int j = i + 1; j < n; j++) {
-            if (tryb) {
-                if (tab[j] < min) {
-                    std::swap(min, tab[j]);
-                }
-            } else {
-                if (tab[j] > min) {
-                    std::swap(min, tab[j]);
-                }
-            }
+void sortowaniePrzezWybor(int *tab, int n, bool tryb) {
+    int min, i, j, temp;
+    for (i = 0; i < n - 1; i++) {
+        min = i;
+        for (j = i + 1; j < n; j++) {
+            if (tab[j] < tab[min] && tryb) min = j;
+            if (tab[j] > tab[min] && !tryb) min = j;
         }
-        tab2[i] = min;
-    }
-    for (int i = 0; i < 5; i++) {
-        tab[i] = tab2[i];
+        temp = tab[min];
+        tab[min] = tab[i];
+        tab[i] = temp;
     }
 }
 
-void sortowaniePrzezWstawianie(int *tab, int n, int tryb) {
+void sortowaniePrzezWstawianie(int *tab, int n, bool tryb) {
+    int x, k;
+    for (int i = 1; i < n; i++) {
+        x = tab[i];
+        for (k = i - 1; k >= 0; k--) {
+            if ((tryb && x < tab[k]) || (!tryb && x > tab[k])) {
+                tab[k + 1] = tab[k];
+            } else
+                break;
+        }
+        tab[k + 1] = x;
+    }
 }
 
-void sortowanieBabelkowe2D(int **tab, int w, int k, int tryb, int nrKol) {
-    int i = 0;
-    while (i < k) {
-        for (int j = 0; j < k - 1; j++) {
-            if (tryb) {
-                if (tab[nrKol][j] > tab[nrKol][j + 1]) {
-                    for (int c = 0; c < w; c++) { std::swap(tab[c][nrKol], tab[c][nrKol]); }
-                }
-            } else {
-                if (tab[j] < tab[j + 1]) {
-                    for (int c = 0; c < w; c++) { std::swap(tab[c][nrKol], tab[c][nrKol]); }
+void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol) {
+    for (int i = 0; i < w - 1; i++) {
+        for (int j = 0; j < w - 1 - i; j++) {
+            if ((tryb && tab[j][nrKol] > tab[j + 1][nrKol]) ||
+                (!tryb && tab[j][nrKol] < tab[j + 1][nrKol])) {
+                for (int c = 0; c < k; c++) {
+                    std::swap(tab[j][c], tab[j + 1][c]);
                 }
             }
         }
-        i++;
     }
 }
