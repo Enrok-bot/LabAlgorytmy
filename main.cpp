@@ -41,22 +41,14 @@ int main() {
 void wczytajStudentow(student *&tab, int n) {
     std::string imie, nazwisko, punkty;
     std::ifstream data("studenci.csv");
-    getline(data, imie);
+    std::getline(data, imie);
     tab = new student[n];
     for (int i = 0; i < n; i++) {
-        //Imię
         std::getline(data, imie, ';');
-
-
-        //Nazwisko
-        std::getline(data, nazwisko, ';');
-
-
-        //Punkty
-        std::getline(data, punkty);
-        // std::cout << imie << " " << nazwisko << " " << punkty << std::endl;
         tab[i].imie = imie;
+        std::getline(data, nazwisko, ';');
         tab[i].nazwisko = nazwisko;
+        std::getline(data, punkty);
         tab[i].punkty = std::stoi(punkty);
     }
     data.close();
