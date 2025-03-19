@@ -1,95 +1,100 @@
 #include <iostream>
-#include <regex>
-#include "tablice.h"
+#include <fstream>
 
-void sortowanieBabelkowe(int *tab, int n, bool tryb);
+struct student {
+    std::string imie;
+    std::string nazwisko;
+    int punkty{};
+};
 
-void sortowaniePrzezWybor(int *tab, int n, bool tryb);
+void sortowanieQuickSort(student *tab, int n, int tryb);
 
-void sortowaniePrzezWstawianie(int *tab, int n, bool tryb);
+void quickSort(student *tab, int n, int tryb);
 
-void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol);
+void wczytajStudentow(student *&tab, int n);
+
+void usunTabliceStudentow(student *&tab);
+
+void wyswietlStudentow(student *tab, int n);
 
 int main() {
-    int *tab1D, **tab2D;
+    std::ifstream data("studenci.csv");
+    std::string line;
+    std::getline(data, line);
+    const int liczbaStudentow = std::stoi(line);
+    data.close();
 
-    przydzielPamiec1D(tab1D, 10);
-    wypelnijTablice1D(tab1D, 10, -8, 24);
+    student *studenci = nullptr;
+    wczytajStudentow(studenci, liczbaStudentow);
 
-    wyswietl1D(tab1D, 10);
+    wyswietlStudentow(studenci, liczbaStudentow);
 
-    sortowanieBabelkowe(tab1D, 5, false);
-    // sortowaniePrzezWybor(tab1D, 5, 0);
-    // sortowaniePrzezWstawianie(tab1D, 5, true);
+    std::cout << std::endl;
 
-    wyswietl1D(tab1D, 10);
-    usunTablice1D(tab1D);
+    sortowanieQuickSort(studenci, liczbaStudentow, 1);
 
-    przydzielPamiec2D(tab2D, 10, 10);
-    wypelnijTablice2D(tab2D, 10, 10, -7, 38);
+    wyswietlStudentow(studenci, liczbaStudentow);
 
-    wyswietl2D(tab2D, 10, 10);
-    sortowanieBabelkowe2D(tab2D, 10, 10, true, 3);
-    wyswietl2D(tab2D, 10, 10);
+    usunTabliceStudentow(studenci);
+    return 0;
+}
+void wczytajStudentow(student *&tab, int n) {
+    std::string imie, nazwisko, punkty;
+    std::ifstream data("studenci.csv");
+    getline(data, imie);
+    tab = new student[n];
+    for (int i = 0; i < n; i++) {
+        //Imię
+        std::getline(data, imie, ';');
 
-    usunTablice2D(tab2D,10);
+
+        //Nazwisko
+        std::getline(data, nazwisko, ';');
+
+
+        //Punkty
+        std::getline(data, punkty);
+        // std::cout << imie << " " << nazwisko << " " << punkty << std::endl;
+        tab[i].imie = imie;
+        tab[i].nazwisko = nazwisko;
+        tab[i].punkty = std::stoi(punkty);
+    }
+    data.close();
 }
 
-void sortowanieBabelkowe(int *tab, int n, bool tryb) {
-    int i = 0;
-    while (i < n) {
-        for (int j = 0; j < n - 1; j++) {
-            if (tryb) {
-                if (tab[j] > tab[j + 1]) {
-                    std::swap(tab[j], tab[j + 1]);
-                }
-            } else {
-                if (tab[j] < tab[j + 1]) {
-                    std::swap(tab[j], tab[j + 1]);
-                }
-            }
-        }
-        i++;
-    }
+void usunTabliceStudentow(student *&tab) {
+    delete[] tab;
+    tab = nullptr;
 }
 
-void sortowaniePrzezWybor(int *tab, int n, bool tryb) {
-    int min, i, j, temp;
-    for (i = 0; i < n - 1; i++) {
-        min = i;
-        for (j = i + 1; j < n; j++) {
-            if (tab[j] < tab[min] && tryb) min = j;
-            if (tab[j] > tab[min] && !tryb) min = j;
-        }
-        temp = tab[min];
-        tab[min] = tab[i];
-        tab[i] = temp;
+void wyswietlStudentow(student *tab, int n) {
+    for (int i = 0; i < n; i++) {
+        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
     }
 }
+void quickSort(student *tab, int left, int right, int tryb) {
+    int i = left, j = right;
+    int pivot = tab[(left + right) / 2].punkty;
 
-void sortowaniePrzezWstawianie(int *tab, int n, bool tryb) {
-    int x, k;
-    for (int i = 1; i < n; i++) {
-        x = tab[i];
-        for (k = i - 1; k >= 0; k--) {
-            if ((tryb && x < tab[k]) || (!tryb && x > tab[k])) {
-                tab[k + 1] = tab[k];
-            } else
-                break;
+    while (i <= j) {
+        if (tryb == 0) { // Rosnąco
+            while (tab[i].punkty < pivot) i++;
+            while (tab[j].punkty > pivot) j--;
+        } else { // Malejąco
+            while (tab[i].punkty > pivot) i++;
+            while (tab[j].punkty < pivot) j--;
         }
-        tab[k + 1] = x;
+
+        if (i <= j) {
+            std::swap(tab[i], tab[j]);
+            i++;
+            j--;
+        }
     }
+
+    if (left < j) quickSort(tab, left, j, tryb);
+    if (i < right) quickSort(tab, i, right, tryb);
 }
-
-void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol) {
-    for (int i = 0; i < w - 1; i++) {
-        for (int j = 0; j < w - 1 - i; j++) {
-            if ((tryb && tab[j][nrKol] > tab[j + 1][nrKol]) ||
-                (!tryb && tab[j][nrKol] < tab[j + 1][nrKol])) {
-                for (int c = 0; c < k; c++) {
-                    std::swap(tab[j][c], tab[j + 1][c]);
-                }
-            }
-        }
-    }
+void sortowanieQuickSort(student *tab, int n, int tryb) {
+    quickSort(tab, 0, n - 1, tryb);
 }
