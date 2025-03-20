@@ -31,17 +31,15 @@ int main() {
     student *studenci = nullptr;
     wczytajStudentow(studenci, liczbaStudentow);
 
-    // wyswietlStudentow(studenci, liczbaStudentow);
+    wyswietlStudentow(studenci, liczbaStudentow);
 
-    // std::cout << std::endl;
+    std::cout << std::endl;
 
-    // wyswietlStudentow2(studenci, liczbaStudentow, sortowanieFlagaPolski(studenci, liczbaStudentow));
+    wyswietlStudentow2(studenci, liczbaStudentow, sortowanieFlagaPolski(studenci, liczbaStudentow));
 
     int granice = sortowanieFlagaWloch(studenci, liczbaStudentow);
 
-    wyswietlStudentow3(studenci, liczbaStudentow,granice %100,granice/100);
-
-    // wyswietlStudentow(studenci, liczbaStudentow);
+    wyswietlStudentow3(studenci, liczbaStudentow, granice % liczbaStudentow, granice / liczbaStudentow);
 
     usunTabliceStudentow(studenci);
     return 0;
@@ -85,7 +83,8 @@ void wyswietlStudentow2(student *tab, int n, int granica) {
         std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
     }
 }
-void wyswietlStudentow3(student *tab, int n, int granica1,int granica2) {
+
+void wyswietlStudentow3(student *tab, int n, int granica1, int granica2) {
     int i = 0;
     std::cout << std::endl << "Studenci, ktorzy otrzymali liczbe punktow podzielnych przez 3:" << std::endl;
     for (; i < granica1; i++) {
@@ -101,14 +100,15 @@ void wyswietlStudentow3(student *tab, int n, int granica1,int granica2) {
         std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
     }
 }
+
 int sortowanieFlagaPolski(student *&tab, int n) {
     int l = 0, p = n - 1;
 
     while (l <= p) {
-        while (tab[l].punkty <= 10) {
+        while (l < n && tab[l].punkty <= 10) {
             l++;
         }
-        while (tab[p].punkty > 10) {
+        while (p >= 0 && tab[p].punkty > 10) {
             p--;
         }
         if (p > l) {
@@ -121,18 +121,16 @@ int sortowanieFlagaPolski(student *&tab, int n) {
 int sortowanieFlagaWloch(student *&tab, int n) {
     int l = 0, m = 0, p = n - 1;
     while (m <= p) {
-        while (tab[m].punkty % 3 == 0) {
+        if (tab[m].punkty % 3 == 0) {
             std::swap(tab[l], tab[m]);
             l++;
             m++;
-        }
-        while (tab[m].punkty % 3 == 1) {
+        } else if (tab[m].punkty % 3 == 1) {
             m++;
-        }
-        while (tab[m].punkty % 3 == 2) {
-            std::swap(tab[p], tab[m]);
+        } else {
+            std::swap(tab[m], tab[p]);
             p--;
         }
     }
-    return (m+1) * 100 + l;
+    return m * n + l;
 }
