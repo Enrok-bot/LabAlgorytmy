@@ -1,131 +1,98 @@
-#include "tablice.h"
 #include <iostream>
-#include <cstdlib>
-#include <limits>
-#include <time.h>
-#include <math.h>
+
+void przydzielPamiec1D(char *&tab, int n);
+
+void usunTablice1D(char *&tab);
+
+void wypelnijTablice1D(char *tab, int n);
+
+void wyswietl1D(int *tab, int n);
+
+int naiwny(char *tekst, char *wzorzec, int dlt, int dlw);
+
+void zudujTabliceDostosowan(char *wzorzec, int dlw, int *p);
+
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p);
 
 int main() {
-    std::cout << std::boolalpha;
-};
+    char *tekst, *wzorzec;
+    przydzielPamiec1D(tekst,15);
+    przydzielPamiec1D(wzorzec,3);
+    std::cout << "Podaj tekst: ";
+    wypelnijTablice1D(tekst,15);
+    std::cout << "Podaj wzorzec: ";
+    wypelnijTablice1D(wzorzec,3);
 
-void przydzielPamiec1D(int *&tab, int n) {
-    tab = new int[n];
+    std::cout << "Tekst: " << tekst << std::endl;
+    std::cout << "Wzorzec: " << wzorzec << std::endl;
+
+    // std::cout << naiwny(tekst,wzorzec,15,3) << std::endl;
+    return 0;
 }
 
-void przydzielPamiec2D(int **&tab, int w, int k) {
-    tab = new int *[w];
-    for (int i = 0; i < w; i++) {
-        tab[i] = new int[k];
+int naiwny(char *tekst, char *wzorzec, int dlt, int dlw) {
+    int i = 0;
+    while (i < dlt - dlw) {
+        int j = 0;
+        while (j < dlw && wzorzec[i] == tekst[i + j]) {
+            j++;
+        }
+        if (j == dlw) {
+            return i;
+        }
+        i++;
     }
+    return NULL;
 }
 
-void wypelnijTablice1D(int *tab, int n, int a, int b) {
-    srand(time(NULL));
-    for (int i = 0; i < n; i++) {
-        tab[i] = rand() % (b - a + 1) + a;
-    }
-}
-
-void wypelnijTablice2D(int **tab, int w, int k, int a, int b) {
-    srand(time(NULL));
-    for (int i = 0; i < w; i++) {
-        for (int j = 0; j < k; j++) {
-            tab[i][j] = rand() % (b - a + 1) + a;
+void zudujTabliceDostosowan(char *wzorzec, int dlw, int *p) {
+    p[0] = 0;
+    p[1] = 0;
+    int t = 0, i = 1;
+    while (i < dlw) {
+        while (t > 0 && (wzorzec[i] != wzorzec[t])) {
+            t = p[t];
+        }
+        if (wzorzec[i] == wzorzec[t]) {
+            t++;
+            p[++i] = t;
+            i++;
         }
     }
 }
 
-void usunTablice1D(int *&tab) {
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p) {
+    int j = 0, i = 1;
+    while (i < dlt - dlw + 1) {
+        while (wzorzec[i] != tekst[i + j] && j < dlw) {
+            j++;
+        }
+        if (j == dlw) {
+            return i;
+        }
+        i = i + std::max(1, j - p[j]);
+        j = p[j];
+    }
+    return NULL;
+}
+
+void przydzielPamiec1D(char *&tab, int n) {
+    tab = new char[n];
+}
+
+void usunTablice1D(char *&tab) {
     delete[] tab;
 }
 
-void usunTablice2D(int **&tab, int w) {
-    for (int i = 0; i < w; ++i) {
-        delete[] tab[i];
+void wypelnijTablice1D(char *tab, int n) {
+    for (int i = 0; i < n; i++) {
+        std::cin >> tab[i];
     }
-    delete[] tab;
+    std::cin.clear();
 }
 
 void wyswietl1D(int *tab, int n) {
     for (int i = 0; i < n; ++i) {
         std::cout << tab[i] << " ";
     }
-}
-
-void wyswietl2D(int **tab, int w, int k) {
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < k; ++j) {
-            std::cout << tab[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-int najmniejszy1D(int *tab, int n) {
-    int min = tab[0];
-    for (int i = 1; i < n; ++i) {
-        if (tab[i] < min) {
-            min = tab[i];
-        }
-    }
-    return min;
-}
-
-int najwiekszy2D(int **tab, int w, int k) {
-    int max = tab[0][0];
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < k; ++j) {
-            if (tab[i][j] > max) max = tab[i][j];
-        }
-    }
-    return max;
-}
-
-void czyPierwszy(int a) {
-    bool piewsza = true;
-    for (int i = 2; i <= sqrt(a); ++i) {
-        if (a % i == 0) piewsza = false;
-    }
-    if (piewsza) std::cout << "Liczba jest pierwsza" << std::endl;
-    else std::cout << "Liczba nie jest pierwsza" << std::endl;
-}
-
-void zliczanie1D(int *tab, int n) {
-    int liczby[10];
-    for (int i = 0; i < 10; i++) {
-        liczby[i] = 0;
-    }
-    for (int i = 0; i < n; ++i) {
-        liczby[tab[i]]++;
-    }
-    for (int i = 0; i < 10; ++i) {
-        std::cout << "Cyfra " << i << "- " << liczby[i] << " razy" << std::endl;
-    }
-}
-
-void sumaCyfr(int a) {
-    int suma = 0;
-    do {
-        suma += a % 10;
-        a /= 10;
-    } while (a != 0);
-    printf("%i\n", suma);
-}
-
-void srednia(int **tab, int w, int k) {
-    int sredniaNad = 0;
-    for (int i = 0; i < w; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            sredniaNad += tab[i][j];
-        }
-    }
-    printf("%i\n", sredniaNad);
-    int sredniaPod = 0;
-    for (int i = 1; i < w; ++i) {
-        for (int j = 0; j < i; ++j) {
-            sredniaPod += tab[i][j];
-        }
-    }
-    printf("%i\n", sredniaPod);
 }
