@@ -1,136 +1,145 @@
-#include <iostream>
+#include <cmath>
 #include <fstream>
+#include <iostream>
 
-struct student {
-    std::string imie;
-    std::string nazwisko;
-    int punkty{};
-};
+void przydzielPamiec1D(char *&tab, int n);
 
-void wczytajStudentow(student *&tab, int n);
+void usunTablice1D(char *&tab);
 
-void usunTabliceStudentow(student *&tab);
+void wypelnijTablice1D(char *tab, int n);
 
-void wyswietlStudentow(student *tab, int n);
+void wyswietl1D(int *tab, int n);
 
-void wyswietlStudentow2(student *tab, int n, int granica);
+int naiwny(char *tekst, char *wzorzec, int dlt, int dlw);
 
-void wyswietlStudentow3(student *tab, int n, int granica1, int granica2);
+void zbudujTabliceDostosowan(char *wzorzec, int dlw, int *p);
 
-int sortowanieFlagaPolski(student *&tab, int n);
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p);
 
-int sortowanieFlagaWloch(student *&tab, int n);
+int wczytajWzorzec(char *&tab);
+
+int tworzenieHash(std::string *wzorzec, int off, int dlw);
+
 
 int main() {
-    std::ifstream data("studenci.csv");
-    std::string line;
-    std::getline(data, line);
-    const int liczbaStudentow = std::stoi(line);
-    data.close();
+    std::string *wzorzec = nullptr;
+    int dlw = wczytajWzorzec(wzorzec);
 
-    student *studenci = nullptr;
-    wczytajStudentow(studenci, liczbaStudentow);
+    std::cout << wzorzec << std::endl;
+    std::cout << dlw << std::endl;
 
-    wyswietlStudentow(studenci, liczbaStudentow);
 
-    std::cout << std::endl;
 
-    wyswietlStudentow2(studenci, liczbaStudentow, sortowanieFlagaPolski(studenci, liczbaStudentow));
-
-    int granice = sortowanieFlagaWloch(studenci, liczbaStudentow);
-
-    wyswietlStudentow3(studenci, liczbaStudentow, granice % liczbaStudentow, granice / liczbaStudentow);
-
-    usunTabliceStudentow(studenci);
-    return 0;
+    std::cout << tworzenieHash(wzorzec,65,dlw) << std::endl;
 }
 
-void wczytajStudentow(student *&tab, int n) {
-    std::string imie, nazwisko, punkty;
-    std::ifstream data("studenci.csv");
-    std::getline(data, imie);
-    tab = new student[n];
-    for (int i = 0; i < n; i++) {
-        std::getline(data, imie, ';');
-        tab[i].imie = imie;
-        std::getline(data, nazwisko, ';');
-        tab[i].nazwisko = nazwisko;
-        std::getline(data, punkty);
-        tab[i].punkty = std::stoi(punkty);
+int wczytajWzorzec(char *&tab) {
+    std::string dlw;
+    std::ifstream data("tekst.txt");
+    std::getline(data, dlw);
+    int n = dlw.length();
+    tab = dlw.c_str();
+    data.close();
+    return n;
+}
+
+void wczytajTekst(char *&tekst) {
+    std::string linia;
+    std::ifstream data("tekst.txt");
+    while (std::getline(data, linia)) {
+
     }
-    data.close();
 }
 
-void usunTabliceStudentow(student *&tab) {
+// char *tekst, *wzorzec;
+// przydzielPamiec1D(tekst,15);
+// przydzielPamiec1D(wzorzec,3);
+// std::cout << "Podaj tekst: ";
+// wypelnijTablice1D(tekst,15);
+// std::cout << "Podaj wzorzec: ";
+// wypelnijTablice1D(wzorzec,3);
+//
+// std::cout << "Tekst: " << tekst << std::endl;
+// std::cout << "Wzorzec: " << wzorzec << std::endl;
+//
+// // std::cout << naiwny(tekst,wzorzec,15,3) << std::endl;
+// return 0;
+
+int tworzenieHash(char *wzorzec, int off, int dlw) {
+    int hash = 0;
+    for (int i = 0; i < dlw; i++) {
+        hash += ((int) wzorzec[i] - off) * pow(256-off, dlw - 1 + i - dlw);
+    }
+    return hash;
+}
+
+int naiwny(char *tekst, char *wzorzec, int dlt, int dlw) {
+    int i = 0;
+    while (i < dlt - dlw) {
+        int j = 0;
+        while (j < dlw && wzorzec[i] == tekst[i + j]) {
+            j++;
+        }
+        if (j == dlw) {
+            return i;
+        }
+        i++;
+    }
+    return NULL;
+}
+
+void zudujTabliceDostosowan(char *wzorzec, int dlw, int *p) {
+    p[0] = 0;
+    p[1] = 0;
+    int t = 0, i = 1;
+    while (i < dlw) {
+        while (t > 0 && (wzorzec[i] != wzorzec[t])) {
+            t = p[t];
+        }
+        if (wzorzec[i] == wzorzec[t]) {
+            t++;
+            p[++i] = t;
+            i++;
+        }
+    }
+}
+
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p) {
+    //Do dokończenia :)
+    int j = 0, i = 1;
+    while (i < dlt - dlw + 1) {
+        while (wzorzec[i] != tekst[i + j] && j < dlw) {
+            j++;
+        }
+        if (j == dlw) {
+            return i;
+        }
+        i = i + std::max(1, j - p[j]);
+        j = p[j];
+    }
+    return NULL;
+}
+
+void BM() {
+}
+
+void przydzielPamiec1D(char *&tab, int n) {
+    tab = new char[n];
+}
+
+void usunTablice1D(char *&tab) {
     delete[] tab;
-    tab = nullptr;
 }
 
-void wyswietlStudentow(student *tab, int n) {
+void wypelnijTablice1D(char *tab, int n) {
     for (int i = 0; i < n; i++) {
-        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
+        std::cin >> tab[i];
     }
+    std::cin.clear();
 }
 
-void wyswietlStudentow2(student *tab, int n, int granica) {
-    int i = 0;
-    std::cout << std::endl << "Studenci, ktorzy otrzymali <=10 punktow:" << std::endl;
-    for (; i < granica; i++) {
-        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
+void wyswietl1D(int *tab, int n) {
+    for (int i = 0; i < n; ++i) {
+        std::cout << tab[i] << " ";
     }
-    std::cout << std::endl << "Studenci, ktorzy otrzymali >10 punktow:" << std::endl;
-    for (; i < n; i++) {
-        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
-    }
-}
-
-void wyswietlStudentow3(student *tab, int n, int granica1, int granica2) {
-    int i = 0;
-    std::cout << std::endl << "Studenci, ktorzy otrzymali liczbe punktow podzielnych przez 3:" << std::endl;
-    for (; i < granica1; i++) {
-        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
-    }
-    std::cout << std::endl << "Studenci, ktorzy otrzymali liczbe punktow podzielnych przez 3 z reszta 1:" << std::endl;
-
-    for (; i < granica2; i++) {
-        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
-    }
-    std::cout << std::endl << "Studenci, ktorzy otrzymali liczbe punktow podzielnych przez 3 z reszta 2:" << std::endl;
-    for (; i < n; i++) {
-        std::cout << tab[i].imie << " " << tab[i].nazwisko << " " << tab[i].punkty << std::endl;
-    }
-}
-
-int sortowanieFlagaPolski(student *&tab, int n) {
-    int l = 0, p = n - 1;
-
-    while (l <= p) {
-        while (l < n && tab[l].punkty <= 10) {
-            l++;
-        }
-        while (p >= 0 && tab[p].punkty > 10) {
-            p--;
-        }
-        if (p > l) {
-            std::swap(tab[l], tab[p]);
-        }
-    }
-    return l;
-}
-
-int sortowanieFlagaWloch(student *&tab, int n) {
-    int l = 0, m = 0, p = n - 1;
-    while (m <= p) {
-        if (tab[m].punkty % 3 == 0) {
-            std::swap(tab[l], tab[m]);
-            l++;
-            m++;
-        } else if (tab[m].punkty % 3 == 1) {
-            m++;
-        } else {
-            std::swap(tab[m], tab[p]);
-            p--;
-        }
-    }
-    return m * n + l;
 }
