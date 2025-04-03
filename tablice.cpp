@@ -61,7 +61,7 @@ void zudujTabliceDostosowan(char *wzorzec, int dlw, int *p) {
     }
 }
 
-int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p) {
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p) { // dokończyć :)
     int j = 0, i = 1;
     while (i < dlt - dlw + 1) {
         while (wzorzec[i] != tekst[i + j] && j < dlw) {
