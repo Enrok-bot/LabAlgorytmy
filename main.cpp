@@ -1,95 +1,98 @@
 #include <iostream>
-#include <regex>
-#include "tablice.h"
 
-void sortowanieBabelkowe(int *tab, int n, bool tryb);
+void przydzielPamiec1D(char *&tab, int n);
 
-void sortowaniePrzezWybor(int *tab, int n, bool tryb);
+void usunTablice1D(char *&tab);
 
-void sortowaniePrzezWstawianie(int *tab, int n, bool tryb);
+void wypelnijTablice1D(char *tab, int n);
 
-void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol);
+void wyswietl1D(int *tab, int n);
+
+int naiwny(char *tekst, char *wzorzec, int dlt, int dlw);
+
+void zudujTabliceDostosowan(char *wzorzec, int dlw, int *p);
+
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p);
 
 int main() {
-    int *tab1D, **tab2D;
+    char *tekst, *wzorzec;
+    przydzielPamiec1D(tekst,15);
+    przydzielPamiec1D(wzorzec,3);
+    std::cout << "Podaj tekst: ";
+    wypelnijTablice1D(tekst,15);
+    std::cout << "Podaj wzorzec: ";
+    wypelnijTablice1D(wzorzec,3);
 
-    przydzielPamiec1D(tab1D, 10);
-    wypelnijTablice1D(tab1D, 10, -8, 24);
+    std::cout << "Tekst: " << tekst << std::endl;
+    std::cout << "Wzorzec: " << wzorzec << std::endl;
 
-    wyswietl1D(tab1D, 10);
-
-    sortowanieBabelkowe(tab1D, 5, false);
-    // sortowaniePrzezWybor(tab1D, 5, 0);
-    // sortowaniePrzezWstawianie(tab1D, 5, true);
-
-    wyswietl1D(tab1D, 10);
-    usunTablice1D(tab1D);
-
-    przydzielPamiec2D(tab2D, 10, 10);
-    wypelnijTablice2D(tab2D, 10, 10, -7, 38);
-
-    wyswietl2D(tab2D, 10, 10);
-    sortowanieBabelkowe2D(tab2D, 10, 10, true, 3);
-    wyswietl2D(tab2D, 10, 10);
-
-    usunTablice2D(tab2D,10);
+    // std::cout << naiwny(tekst,wzorzec,15,3) << std::endl;
+    return 0;
 }
 
-void sortowanieBabelkowe(int *tab, int n, bool tryb) {
+int naiwny(char *tekst, char *wzorzec, int dlt, int dlw) {
     int i = 0;
-    while (i < n) {
-        for (int j = 0; j < n - 1; j++) {
-            if (tryb) {
-                if (tab[j] > tab[j + 1]) {
-                    std::swap(tab[j], tab[j + 1]);
-                }
-            } else {
-                if (tab[j] < tab[j + 1]) {
-                    std::swap(tab[j], tab[j + 1]);
-                }
-            }
+    while (i < dlt - dlw) {
+        int j = 0;
+        while (j < dlw && wzorzec[i] == tekst[i + j]) {
+            j++;
+        }
+        if (j == dlw) {
+            return i;
         }
         i++;
     }
+    return NULL;
 }
 
-void sortowaniePrzezWybor(int *tab, int n, bool tryb) {
-    int min, i, j, temp;
-    for (i = 0; i < n - 1; i++) {
-        min = i;
-        for (j = i + 1; j < n; j++) {
-            if (tab[j] < tab[min] && tryb) min = j;
-            if (tab[j] > tab[min] && !tryb) min = j;
+void zudujTabliceDostosowan(char *wzorzec, int dlw, int *p) {
+    p[0] = 0;
+    p[1] = 0;
+    int t = 0, i = 1;
+    while (i < dlw) {
+        while (t > 0 && (wzorzec[i] != wzorzec[t])) {
+            t = p[t];
         }
-        temp = tab[min];
-        tab[min] = tab[i];
-        tab[i] = temp;
+        if (wzorzec[i] == wzorzec[t]) {
+            t++;
+            p[++i] = t;
+            i++;
+        }
     }
 }
 
-void sortowaniePrzezWstawianie(int *tab, int n, bool tryb) {
-    int x, k;
-    for (int i = 1; i < n; i++) {
-        x = tab[i];
-        for (k = i - 1; k >= 0; k--) {
-            if ((tryb && x < tab[k]) || (!tryb && x > tab[k])) {
-                tab[k + 1] = tab[k];
-            } else
-                break;
+int kmp(char *wzorzec, char *tekst, int dlw, int dlt, int *p) {
+    int j = 0, i = 1;
+    while (i < dlt - dlw + 1) {
+        while (wzorzec[i] != tekst[i + j] && j < dlw) {
+            j++;
         }
-        tab[k + 1] = x;
+        if (j == dlw) {
+            return i;
+        }
+        i = i + std::max(1, j - p[j]);
+        j = p[j];
     }
+    return NULL;
 }
 
-void sortowanieBabelkowe2D(int **tab, int w, int k, bool tryb, int nrKol) {
-    for (int i = 0; i < w - 1; i++) {
-        for (int j = 0; j < w - 1 - i; j++) {
-            if ((tryb && tab[j][nrKol] > tab[j + 1][nrKol]) ||
-                (!tryb && tab[j][nrKol] < tab[j + 1][nrKol])) {
-                for (int c = 0; c < k; c++) {
-                    std::swap(tab[j][c], tab[j + 1][c]);
-                }
-            }
-        }
+void przydzielPamiec1D(char *&tab, int n) {
+    tab = new char[n];
+}
+
+void usunTablice1D(char *&tab) {
+    delete[] tab;
+}
+
+void wypelnijTablice1D(char *tab, int n) {
+    for (int i = 0; i < n; i++) {
+        std::cin >> tab[i];
+    }
+    std::cin.clear();
+}
+
+void wyswietl1D(int *tab, int n) {
+    for (int i = 0; i < n; ++i) {
+        std::cout << tab[i] << " ";
     }
 }
