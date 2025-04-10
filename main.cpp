@@ -1,152 +1,120 @@
+#include <fstream>
 #include <iostream>
-#include <cstdlib>
-#include <limits>
-#include <time.h>
-#include <math.h>
+#include <bits/fs_path.h>
 
-void przydzielPamiec1D(int *&tab, int n);
-
-void przydzielPamiec2D(int **&tab, int w, int k);
-
-void wypelnijTablice1D(int *tab, int n, int a, int b);
-
-void wypelnijTablice2D(int **tab, int w, int k, int a, int b);
-
-void usunTablice1D(int *&tab);
-
-void usunTablice2D(int **&tab, int w);
+struct student {
+    std::string imie;
+    std::string nazwisko;
+    int ocena{};
+};
 
 void wyswietl1D(int *tab, int n);
 
-void wyswietl2D(int **tab, int w, int k);
+void wczytajStudentow(student *&tab, int n);
 
-int najmniejszy1D(int *tab, int n);
+void wypelnijTablice1D(int *tab, int n);
 
-int najwiekszy2D(int **tab, int w, int k);
+void przydzielPamiec1D(int *&tab, int n);
 
-void czyPierwszy(int a);
+int wyszukiwanieLiniowe(int *tab, int n, int wartosc);
 
-void zliczanie1D(int *tab, int n);
+int wyszukiwanieBisekcyjne(student *tab, int prawy, int watrosc, int lewy = 0);
 
-void sumaCyfr(int a);
+void sortowanieStudentow(student *&tab, int n);
 
-void srednia(int **tab, int w, int k);
+int liczbaPunktow(student *&tab, int n, int wartosc);
+
 
 int main() {
-    bool program = true;
-    int wybor;
+    std::ifstream data("studenci.csv");
+    std::string line;
+    std::getline(data, line);
+    const int liczbaStudentow = std::stoi(line);
+    data.close();
 
-    while (program) {
-        for (int i = 1; i <= 4; i++) {
-            std::cout << i << ") zadanie 1." << i + 1 << std::endl;
-        }
-        std::cout << "5) wyjscie z programu " << std::endl;
-        std::cin >> wybor;
-        if (std::cin.fail()) {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Niepoprawne dane. Wpisz numer opcji.\n";
-            continue;
-        }
-        switch (wybor) {
-            case 1: {
-                int *tab, n;
-                std::cout << "Podaj wielkosc tablicy: ";
-                std::cin >> n;
-                przydzielPamiec1D(tab, n);
-                int a, b;
-                std::cout << "Podaj przedzial <a,b>";
-                std::cin >> a >> b;
-                wypelnijTablice1D(tab, n, a, b);
-                int min = najmniejszy1D(tab, n);
-                printf("%i\n", min);
-                czyPierwszy(min);
-                usunTablice1D(tab);
-                break;
-            }
-            case 2: {
-                int *tab, n;
-                std::cout << "Podaj wielkosc tablicy: ";
-                std::cin >> n;
-                przydzielPamiec1D(tab, n);
-                wypelnijTablice1D(tab, n, 0, 9);
-                zliczanie1D(tab, n);
-                usunTablice1D(tab);
-                break;
-            }
-            case 3: {
-                int **tab, w, k;
-                std::cout << "Podaj wymiary tablicy";
-                std::cin >> w >> k;
-                przydzielPamiec2D(tab, w, k);
-                int a, b;
-                std::cout << "Podaj przedzial <a,b>";
-                std::cin >> a >> b;
-                wypelnijTablice2D(tab, w, k, a, b);
-                int max = najwiekszy2D(tab, w, k);
-                printf("%i\n", max);
-                sumaCyfr(max);
-                usunTablice2D(tab, w);
-                break;
-            }
-            case 4: {
-                int **tab, w;
-                std::cout << "Podaj wielkosc tablicy kwadratowej";
-                std::cin >> w;
-                przydzielPamiec2D(tab, w, w);
-                wypelnijTablice2D(tab, w, w, 7, 122);
-                srednia(tab, w, w);
-                usunTablice2D(tab, w);
-                break;
-            }
-            case 5: {
-                program = false;
-                break;
-            }
-            default: {
-                std::cout << "Nie ma takiej opcji";
-                break;
-            }
-        }
+    student *studenci = nullptr;
+    wczytajStudentow(studenci, liczbaStudentow);
+
+    sortowanieStudentow(studenci, liczbaStudentow);
+
+    student *tab = nullptr;
+
+    int punkty = 5;
+    int liczbaPunktow1 = liczbaPunktow(studenci, liczbaStudentow, punkty);
+    tab = new student[liczbaPunktow1];
+
+    sortowanieStudentow(studenci, liczbaStudentow);
+
+    for (int i = 0; i < liczbaPunktow1; i++) {
+        tab[i] = studenci[wyszukiwanieBisekcyjne(studenci, liczbaStudentow, punkty)];
     }
+
+    std::cout << tab[0].imie << std::endl;
+    std::cout << wyszukiwanieBisekcyjne(tab, liczbaStudentow, 5);
+
+    std::ofstream zapis;
+    std::string sciezkaDoZapisu = "wyniki.csv";
+    zapis.open(sciezkaDoZapisu);
+    zapis << liczbaStudentow << std::endl;
+    for (int i = 0; i < liczbaStudentow; i++) {
+        zapis << tab[i].imie << ";" << tab[i].nazwisko << ";";
+        zapis << tab[i].ocena << std::endl;
+    }
+    zapis.close();
+}
+
+int liczbaPunktow(student *&tab, int n, int wartosc) {
+    int ile = 0;
+    for (int i = 0; i < n; i++) {
+        if (tab[i].ocena == wartosc) ile++;
+    }
+    return ile;
+}
+
+int wyszukiwanieBisekcyjne(student *tab, int prawy, int watrosc, int lewy) {
+    int srodek = (lewy + prawy) / 2;
+    if (lewy > prawy) return -1;
+    if (tab[srodek].ocena == watrosc) {
+        tab[srodek].ocena = -1;
+        return srodek;
+    }
+    if (watrosc < tab[srodek].ocena) return wyszukiwanieBisekcyjne(tab, srodek - 1, watrosc, lewy);
+    return wyszukiwanieBisekcyjne(tab, prawy, watrosc, srodek + 1);
+}
+
+int wyszukiwanieLiniowe(int *tab, int n, int wartosc) {
+    n--;
+    while (n >= 0) {
+        if (tab[n] == wartosc) return n;
+        n--;
+    }
+    return -1;
 }
 
 void przydzielPamiec1D(int *&tab, int n) {
     tab = new int[n];
 }
 
-void przydzielPamiec2D(int **&tab, int w, int k) {
-    tab = new int *[w];
-    for (int i = 0; i < w; i++) {
-        tab[i] = new int[k];
-    }
-}
-
-void wypelnijTablice1D(int *tab, int n, int a, int b) {
-    srand(time(NULL));
+void wczytajStudentow(student *&tab, int n) {
+    std::string imie, nazwisko, punkty;
+    std::ifstream data("studenci.csv");
+    std::getline(data, imie);
+    tab = new student[n];
     for (int i = 0; i < n; i++) {
-        tab[i] = rand() % (b - a + 1) + a;
+        std::getline(data, imie, ';');
+        tab[i].imie = imie;
+        std::getline(data, nazwisko, ';');
+        tab[i].nazwisko = nazwisko;
+        std::getline(data, punkty);
+        tab[i].ocena = std::stoi(punkty);
     }
+    data.close();
 }
 
-void wypelnijTablice2D(int **tab, int w, int k, int a, int b) {
-    srand(time(NULL));
-    for (int i = 0; i < w; i++) {
-        for (int j = 0; j < k; j++) {
-            tab[i][j] = rand() % (b - a + 1) + a;
-        }
+void wypelnijTablice1D(int *tab, int n) {
+    for (int i = 0; i < n; i++) {
+        tab[i] = i * 2;
     }
-}
-
-void usunTablice1D(int *&tab) {
-    delete[] tab;
-}
-
-void usunTablice2D(int **&tab, int w) {
-    for (int i = 0; i < w; ++i) {
-        delete[] tab[i];
-    }
-    delete[] tab;
 }
 
 void wyswietl1D(int *tab, int n) {
@@ -155,79 +123,15 @@ void wyswietl1D(int *tab, int n) {
     }
 }
 
-void wyswietl2D(int **tab, int w, int k) {
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < k; ++j) {
-            std::cout << tab[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-int najmniejszy1D(int *tab, int n) {
-    int min = tab[0];
-    for (int i = 1; i < n; ++i) {
-        if (tab[i] < min) {
-            min = tab[i];
+void sortowanieStudentow(student *&tab, int n) {
+    bool sort = true;
+    while (sort) {
+        sort = false;
+        for (int i = 0; i < n - 1; i++) {
+            if (tab[i].ocena > tab[i + 1].ocena) {
+                sort = true;
+                std::swap(tab[i], tab[i + 1]);
+            }
         }
     }
-    return min;
-}
-
-int najwiekszy2D(int **tab, int w, int k) {
-    int max = tab[0][0];
-    for (int i = 0; i < w; ++i) {
-        for (int j = 0; j < k; ++j) {
-            if (tab[i][j] > max) max = tab[i][j];
-        }
-    }
-    return max;
-}
-
-void czyPierwszy(int a) {
-    bool piewsza = true;
-    for (int i = 2; i <= sqrt(a); ++i) {
-        if (a % i == 0) piewsza = false;
-    }
-    if (piewsza) std::cout << "Liczba jest pierwsza" << std::endl;
-    else std::cout << "Liczba nie jest pierwsza" << std::endl;
-}
-
-void zliczanie1D(int *tab, int n) {
-    int liczby[10];
-    for (int i = 0; i < 10; i++) {
-        liczby[i] = 0;
-    }
-    for (int i = 0; i < n; ++i) {
-        liczby[tab[i]]++;
-    }
-    for (int i = 0; i < 10; ++i) {
-        std::cout << "Cyfra " << i << "- " << liczby[i] << " razy" << std::endl;
-    }
-}
-
-void sumaCyfr(int a) {
-    int suma = 0;
-    do {
-        suma += a % 10;
-        a /= 10;
-    } while (a != 0);
-    printf("%i\n", suma);
-}
-
-void srednia(int **tab, int w, int k) {
-    int sredniaNad = 0;
-    for (int i = 0; i < w; ++i) {
-        for (int j = i + 1; j < k; ++j) {
-            sredniaNad += tab[i][j];
-        }
-    }
-    printf("%i\n", sredniaNad);
-    int sredniaPod = 0;
-    for (int i = 1; i < w; ++i) {
-        for (int j = 0; j < i; ++j) {
-            sredniaPod += tab[i][j];
-        }
-    }
-    printf("%i\n", sredniaPod);
 }
