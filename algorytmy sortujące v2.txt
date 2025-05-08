@@ -1,0 +1,37 @@
+1.kill -STOP 678
+2.awk -F: '$7 ~ /csh$/ { print $1 }' /etc/passwd
+3.find /tmp -type f -user "$(whoami)"
+4.alias la='ls -la'
+5.find /etc -name '*mbd*' 2>/dev/null | wc -l
+6.find /var/log -type f 2> errors
+7.touch test && chmod o+rwx test
+8.find /home -maxdepth 1 -type f -name '???' -exec cp {} ~ \;
+9.pwd
+10.grep 'b[^ ]*h' /etc/passwd
+11.ls -d ~/a* ~/P* 2>/dev/null
+12.rm -r "nowy kat"
+13.kill -SIGSTOP 34
+14.ln -s /usr/local/ ~/skrot
+15.
+	#!/bin/bash
+	if [ -z "$1" ]; then
+    	  echo "Użycie: $0 rozszerzenie"
+    	exit 1
+	fi
+
+	ext="$1"
+
+	files=$(find ~ -type f -name "*.$ext")
+
+	count=$(echo "$files" | grep -c .)
+	echo "Znaleziono $count plików z rozszerzeniem .$ext"
+
+	for file in $files; do
+    	  ls -l "$file"
+	done
+
+16.
+	#!/bin/bash
+	for i in {3..15..2}; do
+  	echo $i
+	done
